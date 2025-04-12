@@ -23,4 +23,27 @@ if files:
         selected_columns = st.multiselect(f"Select Columns - {file.name}" , df.columns , default=df.columns)
         df = df[selected_columns]
         st.dataframe(df.head())
-        if st.checkbox
+        if st.checkbox(f"📊 Show chart - {file.name}") and not df.select_dtypes(include= "number").empty:
+            st.bar_chart(df.select_dtypes(include="number").iloc[:, :2])
+        
+        format_choice = st.radio(f"Convert {file.name} to:", ["CSV" , "Excel"], key=file.name)
+
+        if st.button(f"👇 Download {file.name} as {format_choice}"):
+            output = BytesIO()
+            if format_choice == "CSV":
+                df.to_csv(output , index =False)
+                mime = "text/csv"
+                new_name = file.name.replace(ext , 'csv')
+            else:
+                df.to_excel(output , index =False)
+                mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                new_name = file.name.replace(ext , 'xlsx')
+            output.seek(0)
+            st.download_button("👇 Download File" , file_name = new_name , data = output , mime= mime)
+            st.success(f"File downloaded as {new_name}")
+                
+
+                
+
+                
+                
